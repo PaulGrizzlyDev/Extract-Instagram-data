@@ -1,58 +1,24 @@
 <?php
+require 'classes/UserInstagram.php';
 
-class UserInstagram{
-    // GET Instagram user Data
-    public function getDataUserInstagram($username){
-    $response = @file_get_contents( "https://www.instagram.com/$username/?__a=1" );
 
-    if ( $response !== false ) {
-        $data = json_decode( $response, true );
-    // var_dump($data); 
-        if ( $data !== null ) {
-            $full_name = $data['graphql']['user']['full_name'];
-            $followers  = number_format($data['graphql']['user']['edge_followed_by']['count'],0, '', '.');
-            $following  = number_format($data['graphql']['user']['edge_follow']['count'],0, '', '.');
-        
-            
-            return "{$full_name} have {$followers} followers and {$following} users following.".$images;
-        }
-
-        } else {
-            return 'User not exists';
-
-        }
-    }
-    // Get Instagram user images thumbs
-    public function getImageInstagramUser($username){
-
-        $response = @file_get_contents( "https://www.instagram.com/$username/?__a=1" );
-
-    if ( $response !== false ) {
-        $data = json_decode( $response, true );
-    
-        if ( $data !== null ) {
-        $latest_images = $data['graphql']['user']['edge_owner_to_timeline_media']['edges'];
-       
-        $images = [];
-	    for($i = 0; $i<12; $i++) {
-                if (isset($latest_images[$i])) {
-                    $images['https://www.instagram.com/p/'.$latest_images[$i]['node']['shortcode']] = $latest_images[$i]['node']['thumbnail_resources'][0]['src'];
-                }
-        }
-        return $images;
-    } else {
-        return 'User not exists';
-
-    }}
-   
-}
-}
 $user = new UserInstagram(); 
 // change value $username for your instagram user without @
 $username = "elrubiuswtf";
-echo $user->getDataUserInstagram($username);
+echo $user->getDataUserInstagram($username)."<br/>";
 $images =  $user->getImageInstagramUser($username);
+$fecha = date_create();
 foreach($images as $image){
-    echo "<img src='{$image}'/>"; 
+    echo "<div style='width: 200px; margin: 10px; float: left; '>";
+    echo "<div style='height: 200px;  text-align: center; overflow: hidden;width: 200px'>";
+ 
+   echo "<img style='width: 200px; ' src='".$image[0]."'><br/>";
+   echo "</div>";
+   echo $image[1]." Likes<br/>";
+   echo $image[2]." Comments<br/>";
+   echo $image[3]." <br/>";
+   date_timestamp_set($fecha, $image[4]);
+    echo date_format($fecha, 'Y-m-d H:i:s') . "\n";
+   echo "</div>";
 }
 ?>
